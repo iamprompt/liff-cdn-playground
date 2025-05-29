@@ -85,6 +85,11 @@ export const useLIFFContext = (): LIFFContextType => {
     patch: parseAsBoolean.withDefault(true),
   })
 
+  const [customLiffId] = useQueryState(
+    'liffId',
+    parseAsString.withDefault(import.meta.env.LINE_LIFF_ID || ''),
+  )
+
   const loadSdk = useCallback((version: string, patch?: boolean) => {
     const isCdnEdgeVersion = /^\d+$/.test(version)
     const isCdnFixedVersion = /^\d+\.\d+\.\d+$/.test(version)
@@ -135,7 +140,7 @@ export const useLIFFContext = (): LIFFContextType => {
 
   const initializeLIFF = async () => {
     try {
-      await window.liff.init({ liffId: import.meta.env.LINE_LIFF_ID })
+      await window.liff.init({ liffId: customLiffId })
       setIsReady(true)
 
       const userContext = window.liff.getContext()
