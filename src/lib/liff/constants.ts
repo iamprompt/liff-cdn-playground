@@ -1,0 +1,59 @@
+export enum LIFFCapabilities {
+  SHARE_TARGET_PICKER = 'shareTargetPicker',
+  SEND_MESSAGE = 'sendMessage',
+  SCAN_CODE_V2 = 'scanCodeV2',
+}
+
+export enum LIFFSdkVersionType {
+  EDGE = 'edge',
+  SPECIFIC = 'specific',
+}
+
+export const LIFF_SDK_VERSIONS = [
+  {
+    type: LIFFSdkVersionType.EDGE,
+    label: 'Edge (Latest)',
+    versions: [{ version: '2', latest: true }],
+  },
+  {
+    type: LIFFSdkVersionType.SPECIFIC,
+    label: 'Specific Version',
+    versions: [
+      { version: '2.26.1', latest: true },
+      { version: '2.26.0', latest: false },
+      { version: '2.25.1', latest: false },
+      { version: '2.25.0', latest: false },
+      { version: '2.24.0', latest: false },
+      { version: '2.23.2', latest: false },
+      { version: '2.23.1', latest: false },
+      { version: '2.23.0', latest: false },
+      { version: '2.22.4', latest: false },
+      { version: '2.22.3', latest: false },
+      { version: '2.22.2', latest: false },
+      { version: '2.22.1', latest: false },
+      { version: '2.22.0', latest: false },
+      { version: '2.21.4', latest: false },
+      { version: '2.21.3', latest: false },
+      { version: '2.21.2', latest: false },
+      { version: '2.21.1', latest: false },
+      { version: '2.21.0', latest: false },
+      { version: '2.20.3', latest: false },
+      { version: '2.20.2', latest: false },
+      { version: '2.20.1', latest: false },
+      { version: '2.19.1', latest: false },
+      { version: '2.19.0', latest: false },
+      { version: '2.18.2', latest: false },
+      { version: '2.18.1', latest: false },
+      { version: '2.18.0', latest: false },
+      { version: '2.17.0', latest: false },
+      { version: '2.16.1', latest: false },
+      { version: '2.16.0', latest: false },
+      { version: '2.15.0', latest: false },
+      { version: '2.14.0', latest: false },
+      { version: '2.13.0', latest: false },
+      { version: '2.12.0', latest: false },
+      { version: '2.11.1', latest: false },
+      { version: '2.11.0', latest: false },
+    ],
+  },
+]
