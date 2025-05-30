@@ -7,6 +7,7 @@ import { LIFFCapabilities } from './lib/liff/constants'
 import { SDKVersionSelector } from './components/SDKVersionSelector'
 import { Badge } from './components/ui/badge'
 import { SDKLinkShareButton } from './components/SDKLinkShareButton'
+import { FullPageLoading } from './components/FullPageLoading'
 
 function App() {
   const {
@@ -113,6 +114,10 @@ function App() {
       },
     ]
   }, [profile, decodedIDToken, context, isInClient, os, capabilities])
+
+  if (!isReady) {
+    return <FullPageLoading />
+  }
 
   return (
     <div className="p-4 pb-10">
