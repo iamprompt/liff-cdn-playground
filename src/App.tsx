@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
 import { LIFFCapabilities } from './lib/liff/constants'
 import { SDKVersionSelector } from './components/SDKVersionSelector'
 import { Badge } from './components/ui/badge'
+import { SDKLinkShareButton } from './components/SDKLinkShareButton'
 
 function App() {
   const {
@@ -66,7 +67,7 @@ function App() {
       {
         key: 'liffId',
         label: 'LIFF ID',
-        value: context?.liffId || 'N/A',
+        value: window.liff?.id || 'N/A',
       },
       {
         key: 'viewType',
@@ -96,6 +97,11 @@ function App() {
         value: window.liff?.getAppLanguage?.() || 'N/A',
       },
       {
+        key: 'language',
+        label: 'Language',
+        value: window.liff?.getLanguage?.() || 'N/A',
+      },
+      {
         key: 'lineVersion',
         label: 'LINE Version',
         value: window.liff?.getLineVersion?.() || 'N/A',
@@ -110,29 +116,34 @@ function App() {
 
   return (
     <div className="p-4 pb-10">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">LIFF Playground</h1>
+      <div className="flex items-end justify-between mb-4">
+        <div className="flex flex-col gap-2">
           <Badge>{`v${sdkVersion.version}${sdkVersion.patch ? ' (Patch)' : ''}`}</Badge>
+          <h1 className="text-2xl font-bold">LIFF Playground</h1>
         </div>
         <div className="flex items-center gap-2">
           <SDKVersionSelector />
+          <SDKLinkShareButton />
           {isReady && !isInClient ? (
             <>
-              <Button
-                variant="default"
-                onClick={() => login()}
-                disabled={isLoggedIn || !isReady}
-              >
-                Login
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => logout()}
-                disabled={!isLoggedIn || !isReady}
-              >
-                Logout
-              </Button>
+              {!isLoggedIn && (
+                <Button
+                  variant="default"
+                  onClick={() => login()}
+                  disabled={isLoggedIn || !isReady}
+                >
+                  Login
+                </Button>
+              )}
+              {isLoggedIn && (
+                <Button
+                  variant="outline"
+                  onClick={() => logout()}
+                  disabled={!isLoggedIn || !isReady}
+                >
+                  Logout
+                </Button>
+              )}
             </>
           ) : null}
         </div>
