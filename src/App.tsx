@@ -5,6 +5,7 @@ import { Button } from './components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
 import { LIFFCapabilities } from './lib/liff/constants'
 import { SDKVersionSelector } from './components/SDKVersionSelector'
+import { Badge } from './components/ui/badge'
 
 function App() {
   const {
@@ -18,6 +19,7 @@ function App() {
     isInClient,
     os,
     capabilities,
+    sdkVersion,
   } = useLIFF()
 
   useVConsole()
@@ -109,7 +111,10 @@ function App() {
   return (
     <div className="p-4 pb-10">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">LIFF Playground</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">LIFF Playground</h1>
+          <Badge>{`v${sdkVersion.version}${sdkVersion.patch ? ' (Patch)' : ''}`}</Badge>
+        </div>
         <div className="flex items-center gap-2">
           <SDKVersionSelector />
           {isReady && !isInClient ? (
