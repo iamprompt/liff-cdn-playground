@@ -93,12 +93,12 @@ function App() {
       {
         key: 'appLanguage',
         label: 'App Language',
-        value: window.liff?.getAppLanguage() || 'N/A',
+        value: window.liff?.getAppLanguage?.() || 'N/A',
       },
       {
         key: 'lineVersion',
         label: 'LINE Version',
-        value: window.liff?.getLineVersion() || 'N/A',
+        value: window.liff?.getLineVersion?.() || 'N/A',
       },
       {
         key: 'isMiniApp',

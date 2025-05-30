@@ -14,6 +14,7 @@ import {
 } from 'react'
 import type { Context, DecodedIDToken, OS, Profile } from './types'
 import { LIFFCapabilities, LIFFSdkVersionType } from './constants'
+import { isApiAvailable } from './utils'
 
 type LIFFContextType = {
   isReady: boolean
@@ -151,9 +152,8 @@ export const useLIFFContext = (): LIFFContextType => {
       setOS(window.liff.getOS())
 
       const canSendMessage = userContext?.scope.includes('chat_message.write')
-      const canShareTargetPicker =
-        window.liff.isApiAvailable('shareTargetPicker')
-      const canScanCodeV2 = window.liff.isApiAvailable('scanCodeV2')
+      const canShareTargetPicker = isApiAvailable('shareTargetPicker')
+      const canScanCodeV2 = isApiAvailable('scanCodeV2')
 
       const userCapabilities: LIFFCapabilities[] = []
       if (canSendMessage) {
@@ -191,7 +191,9 @@ export const useLIFFContext = (): LIFFContextType => {
       )
       return
     }
-    window.liff.login()
+    window.liff.login({
+      redirectUri: window.location.href,
+    })
   }
 
   const logout = () => {
