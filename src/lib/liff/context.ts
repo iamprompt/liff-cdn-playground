@@ -173,9 +173,6 @@ export const useLIFFContext = (): LIFFContextType => {
       const canScanCodeV2 = isApiAvailable('scanCodeV2')
 
       const userCapabilities: LIFFCapabilities[] = []
-      if (canShareTargetPicker) {
-        userCapabilities.push(LIFFCapabilities.SHARE_TARGET_PICKER)
-      }
       if (canScanCodeV2) {
         userCapabilities.push(LIFFCapabilities.SCAN_CODE_V2)
       }
@@ -197,6 +194,10 @@ export const useLIFFContext = (): LIFFContextType => {
 
         const scopes = (await window.liff.permission.getGrantedAll?.()) || null
         console.log('Granted scopes:', scopes)
+
+        if (canShareTargetPicker) {
+          userCapabilities.push(LIFFCapabilities.SHARE_TARGET_PICKER)
+        }
 
         if (scopes) {
           if (canSendMessage && scopes.includes(LIFFScope.CHAT_MESSAGE)) {
