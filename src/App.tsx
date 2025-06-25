@@ -8,6 +8,10 @@ import { SDKVersionSelector } from './components/SDKVersionSelector'
 import { Badge } from './components/ui/badge'
 import { SDKLinkShareButton } from './components/SDKLinkShareButton'
 import { FullPageLoading } from './components/FullPageLoading'
+import {
+  SendMessageButton,
+  ShareTargetPickerButton,
+} from './components/DetailActions'
 
 function App() {
   const {
@@ -16,8 +20,10 @@ function App() {
     logout,
     isLoggedIn,
     profile,
+    idToken,
     decodedIDToken,
     context,
+    accessToken,
     isInClient,
     os,
     capabilities,
@@ -59,6 +65,8 @@ function App() {
         value: capabilities.includes(LIFFCapabilities.SEND_MESSAGE)
           ? 'Yes'
           : 'No',
+        actionComponent: SendMessageButton,
+        actionHidden: !capabilities.includes(LIFFCapabilities.SEND_MESSAGE),
       },
       {
         key: 'isInClient',
@@ -86,6 +94,10 @@ function App() {
         value: capabilities.includes(LIFFCapabilities.SHARE_TARGET_PICKER)
           ? 'Yes'
           : 'No',
+        actionComponent: ShareTargetPickerButton,
+        actionHidden: !capabilities.includes(
+          LIFFCapabilities.SHARE_TARGET_PICKER,
+        ),
       },
       {
         key: 'os',
@@ -112,8 +124,27 @@ function App() {
         label: 'Is Mini App',
         value: context?.miniDomainAllowed ? 'Yes' : 'No',
       },
+      {
+        key: 'idToken',
+        label: 'ID Token',
+        value: idToken || 'N/A',
+      },
+      {
+        key: 'accessToken',
+        label: 'Access Token',
+        value: accessToken || 'N/A',
+      },
     ]
-  }, [profile, decodedIDToken, context, isInClient, os, capabilities])
+  }, [
+    profile,
+    idToken,
+    accessToken,
+    decodedIDToken,
+    context,
+    isInClient,
+    os,
+    capabilities,
+  ])
 
   if (!isReady) {
     return <FullPageLoading />
@@ -171,7 +202,15 @@ function App() {
       <ul className="divide-dashed divide-y divide-gray-200">
         {details.map((detail) => (
           <li key={detail.key} className="break-all py-1">
-            <strong>{detail.label}:</strong> {detail.value}
+            <span className="font-bold text-nowrap">{detail.label}:</span>{' '}
+            <span>
+              {detail.value}
+              {detail.actionComponent && !detail.actionHidden && (
+                <span className="ml-2">
+                  <detail.actionComponent />
+                </span>
+              )}
+            </span>
           </li>
         ))}
       </ul>

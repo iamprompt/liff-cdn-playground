@@ -13,7 +13,7 @@ import {
   useState,
 } from 'react'
 import type { Context, DecodedIDToken, OS, Profile } from './types'
-import { LIFFCapabilities, LIFFSdkVersionType } from './constants'
+import { LIFFCapabilities, LIFFScope, LIFFSdkVersionType } from './constants'
 import { isApiAvailable } from './utils'
 
 type LIFFContextType = {
@@ -25,11 +25,16 @@ type LIFFContextType = {
   sdkVersion: { version: string; patch: boolean; type: LIFFSdkVersionType }
   setSdkVersion: (version: string, patch: boolean) => void
   profile: Profile | null
+  idToken: string | null
+  accessToken: string | null
   decodedIDToken: DecodedIDToken | null
   context: Context
   isInClient: boolean
   os: OS
   capabilities: LIFFCapabilities[]
+  isUserScopeQuery?: boolean
+  userScope?: LIFFScope[]
+  hasPermission: (scope: LIFFScope) => boolean
 }
 
 const DefaultLIFFContext: LIFFContextType = {
@@ -46,12 +51,19 @@ const DefaultLIFFContext: LIFFContextType = {
     throw new Error('This function is not implemented yet.')
   },
   profile: null,
+  idToken: null,
+  accessToken: null,
   decodedIDToken: null,
   context: null,
   isInClient: false,
   os: undefined,
   sdkVersion: { version: '2', patch: true, type: LIFFSdkVersionType.EDGE },
   capabilities: [],
+  isUserScopeQuery: false,
+  userScope: [],
+  hasPermission: (scope: LIFFScope) => {
+    throw new Error('This function is not implemented yet.')
+  },
 }
 
 export const LIFFContext = createContext<LIFFContextType>(DefaultLIFFContext)
@@ -72,7 +84,12 @@ export const useLIFFContext = (): LIFFContextType => {
 
   const [profile, setProfile] = useState<Profile | null>(null)
   const [decodedIDToken, setDecodedIDToken] = useState<DecodedIDToken>(null)
+  const [idToken, setIdToken] = useState<string | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
   const [context, setContext] = useState<Context>(null)
+
+  const [isUserScopeQuery, setIsUserScopeQuery] = useState(false)
+  const [userScope, setUserScope] = useState<LIFFScope[]>([])
 
   const [isInClient, setIsInClient] = useState(false)
   const [os, setOS] = useState<OS>(undefined)
@@ -156,9 +173,6 @@ export const useLIFFContext = (): LIFFContextType => {
       const canScanCodeV2 = isApiAvailable('scanCodeV2')
 
       const userCapabilities: LIFFCapabilities[] = []
-      if (canSendMessage) {
-        userCapabilities.push(LIFFCapabilities.SEND_MESSAGE)
-      }
       if (canShareTargetPicker) {
         userCapabilities.push(LIFFCapabilities.SHARE_TARGET_PICKER)
       }
@@ -177,7 +191,31 @@ export const useLIFFContext = (): LIFFContextType => {
 
         const idToken = window.liff.getDecodedIDToken()
         console.log('Decoded ID Token:', idToken)
+        setIdToken(window.liff.getIDToken())
+        setAccessToken(window.liff.getAccessToken())
         setDecodedIDToken(idToken)
+
+        const scopes = (await window.liff.permission.getGrantedAll?.()) || null
+        console.log('Granted scopes:', scopes)
+
+        if (scopes) {
+          if (canSendMessage && scopes.includes(LIFFScope.CHAT_MESSAGE)) {
+            userCapabilities.push(LIFFCapabilities.SEND_MESSAGE)
+          }
+
+          setIsUserScopeQuery(true)
+          setUserScope(scopes as LIFFScope[])
+          console.log('Granted scopes:', scopes)
+        } else {
+          console.warn('No granted scopes found.')
+          if (
+            canSendMessage &&
+            userContext?.type !== 'none' &&
+            userContext?.type !== 'external'
+          ) {
+            userCapabilities.push(LIFFCapabilities.SEND_MESSAGE)
+          }
+        }
       }
     } catch (error) {
       console.error('LIFF initialization failed:', error)
@@ -207,9 +245,33 @@ export const useLIFFContext = (): LIFFContextType => {
     setIsLoggedIn(false)
     setProfile(null)
     setDecodedIDToken(null)
+    setIdToken(null)
+    setAccessToken(null)
     console.log('User logged out successfully.')
   }
 
+  const hasPermission = useCallback(
+    (scope: LIFFScope): boolean => {
+      if (!isReady) {
+        console.warn(
+          'LIFF is not ready or user scope query is not available. Cannot check permission.',
+        )
+        return false
+      }
+
+      console.log('isUserScopeQuery:', isUserScopeQuery)
+
+      if (isUserScopeQuery) {
+        const isAllowed = userScope.includes(scope)
+        console.log(`Checking permission for scope "${scope}": ${isAllowed}`)
+
+        return userScope.includes(scope)
+      }
+
+      return context?.scope?.includes(scope) || false
+    },
+    [isReady, isUserScopeQuery, userScope, context],
+  )
   const setSdkVersion = async (version: string, patch: boolean) => {
     const isCdnEdgeVersion = /^\d+$/.test(version)
     const isCdnFixedVersion = /^\d+\.\d+\.\d+$/.test(version)
@@ -247,10 +309,15 @@ export const useLIFFContext = (): LIFFContextType => {
     setSdkVersion,
     profile,
     decodedIDToken,
+    idToken,
+    accessToken,
     context,
     isInClient,
     os,
     capabilities,
+    userScope,
+    isUserScopeQuery,
+    hasPermission,
     sdkVersion: {
       version: query.version,
       patch: query.patch,

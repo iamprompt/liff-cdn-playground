@@ -9,6 +9,13 @@ export enum LIFFSdkVersionType {
   SPECIFIC = 'specific',
 }
 
+export enum LIFFScope {
+  PROFILE = 'profile',
+  OPENID = 'openid',
+  EMAIL = 'email',
+  CHAT_MESSAGE = 'chat_message.write',
+}
+
 export const LIFF_SDK_VERSIONS = [
   {
     type: LIFFSdkVersionType.EDGE,
