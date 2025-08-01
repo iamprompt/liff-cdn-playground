@@ -151,69 +151,73 @@ function App() {
   }
 
   return (
-    <div className="p-4 pb-10">
-      <div className="flex items-end justify-between mb-4">
-        <div className="flex flex-col gap-2">
-          <Badge>{`v${sdkVersion.version}${sdkVersion.patch ? ' (Patch)' : ''}`}</Badge>
-          <h1 className="text-2xl font-bold">LIFF Playground</h1>
+    <div className="mt-safe-inset-top">
+      <div className="p-4 pt-0 mt-4 pb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-2 justify-between mb-4">
+          <div className="flex flex-row-reverse justify-end items-center sm:flex-col sm:justify-center sm:items-start gap-2">
+            <div>
+              <Badge>{`v${sdkVersion.version}${sdkVersion.patch ? ' (Patch)' : ''}`}</Badge>
+            </div>
+            <h1 className="text-2xl font-bold">LIFF Playground</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <SDKVersionSelector />
+            <SDKLinkShareButton />
+            {isReady && !isInClient ? (
+              <>
+                {!isLoggedIn && (
+                  <Button
+                    variant="default"
+                    onClick={() => login()}
+                    disabled={isLoggedIn || !isReady}
+                  >
+                    Login
+                  </Button>
+                )}
+                {isLoggedIn && (
+                  <Button
+                    variant="outline"
+                    onClick={() => logout()}
+                    disabled={!isLoggedIn || !isReady}
+                  >
+                    Logout
+                  </Button>
+                )}
+              </>
+            ) : null}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <SDKVersionSelector />
-          <SDKLinkShareButton />
-          {isReady && !isInClient ? (
-            <>
-              {!isLoggedIn && (
-                <Button
-                  variant="default"
-                  onClick={() => login()}
-                  disabled={isLoggedIn || !isReady}
-                >
-                  Login
-                </Button>
-              )}
-              {isLoggedIn && (
-                <Button
-                  variant="outline"
-                  onClick={() => logout()}
-                  disabled={!isLoggedIn || !isReady}
-                >
-                  Logout
-                </Button>
-              )}
-            </>
-          ) : null}
-        </div>
-      </div>
-      <div className="my-4">
-        <Avatar className="size-48 mx-auto">
-          <AvatarImage
-            src={profile?.pictureUrl}
-            alt={profile?.displayName || 'User Avatar'}
-            draggable={false}
-          />
-          <AvatarFallback className="bg-gray-200 text-gray-600">
-            <img
-              src="/images/default-avatar.webp"
-              alt={profile?.displayName || 'Default Avatar'}
+        <div className="my-4">
+          <Avatar className="size-48 mx-auto">
+            <AvatarImage
+              src={profile?.pictureUrl}
+              alt={profile?.displayName || 'User Avatar'}
+              draggable={false}
             />
-          </AvatarFallback>
-        </Avatar>
+            <AvatarFallback className="bg-gray-200 text-gray-600">
+              <img
+                src="/images/default-avatar.webp"
+                alt={profile?.displayName || 'Default Avatar'}
+              />
+            </AvatarFallback>
+          </Avatar>
+        </div>
+        <ul className="divide-dashed divide-y divide-gray-200">
+          {details.map((detail) => (
+            <li key={detail.key} className="break-all py-1">
+              <span className="font-bold text-nowrap">{detail.label}:</span>{' '}
+              <span>
+                {detail.value}
+                {detail.actionComponent && !detail.actionHidden && (
+                  <span className="ml-2">
+                    <detail.actionComponent />
+                  </span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="divide-dashed divide-y divide-gray-200">
-        {details.map((detail) => (
-          <li key={detail.key} className="break-all py-1">
-            <span className="font-bold text-nowrap">{detail.label}:</span>{' '}
-            <span>
-              {detail.value}
-              {detail.actionComponent && !detail.actionHidden && (
-                <span className="ml-2">
-                  <detail.actionComponent />
-                </span>
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }
