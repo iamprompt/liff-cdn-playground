@@ -233,6 +233,8 @@ export const useLIFFContext = (): LIFFContextType => {
             userCapabilities.push(LIFFCapabilities.SEND_MESSAGE)
           }
         }
+
+        setCapabilities(userCapabilities)
       }
     } catch (error) {
       console.error('LIFF initialization failed:', error)
