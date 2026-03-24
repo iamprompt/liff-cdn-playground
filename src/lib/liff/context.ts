@@ -185,7 +185,6 @@ export const useLIFFContext = (): LIFFContextType => {
       if (canScanCodeV2) {
         userCapabilities.push(LIFFCapabilities.SCAN_CODE_V2)
       }
-      setCapabilities(userCapabilities)
 
       if (window.liff.isLoggedIn()) {
         console.log('User is logged in')
@@ -233,9 +232,9 @@ export const useLIFFContext = (): LIFFContextType => {
             userCapabilities.push(LIFFCapabilities.SEND_MESSAGE)
           }
         }
-
-        setCapabilities(userCapabilities)
       }
+      
+      setCapabilities(userCapabilities)
     } catch (error) {
       console.error('LIFF initialization failed:', error)
     }
