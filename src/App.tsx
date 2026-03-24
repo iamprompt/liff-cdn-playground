@@ -12,6 +12,7 @@ import {
   SendMessageButton,
   ShareTargetPickerButton,
 } from './components/DetailActions'
+import { RequestFriendshipButton } from './components/DetailActions/RequestFriendshipButton'
 
 function App() {
   const {
@@ -25,6 +26,7 @@ function App() {
     context,
     accessToken,
     isInClient,
+    isFriendship,
     os,
     capabilities,
     sdkVersion,
@@ -125,6 +127,15 @@ function App() {
         value: context?.miniDomainAllowed ? 'Yes' : 'No',
       },
       {
+        key: 'friendship',
+        label: 'Friendship',
+        value: isFriendship ? 'Yes' : 'No',
+        actionComponent: RequestFriendshipButton,
+        actionHidden:
+          !capabilities.includes(LIFFCapabilities.REQUEST_FRIENDSHIP) ||
+          isFriendship,
+      },
+      {
         key: 'idToken',
         label: 'ID Token',
         value: idToken || 'N/A',
@@ -142,6 +153,7 @@ function App() {
     decodedIDToken,
     context,
     isInClient,
+    isFriendship,
     os,
     capabilities,
   ])

@@ -33,8 +33,10 @@ type LIFFContextType = {
   os: OS
   capabilities: LIFFCapabilities[]
   isUserScopeQuery?: boolean
+  isFriendship?: boolean
   userScope?: LIFFScope[]
   hasPermission: (scope: LIFFScope) => boolean
+  refetchFriendship: () => Promise<void>
 }
 
 const DefaultLIFFContext: LIFFContextType = {
@@ -60,8 +62,12 @@ const DefaultLIFFContext: LIFFContextType = {
   sdkVersion: { version: '2', patch: true, type: LIFFSdkVersionType.EDGE },
   capabilities: [],
   isUserScopeQuery: false,
+  isFriendship: false,
   userScope: [],
   hasPermission: (scope: LIFFScope) => {
+    throw new Error('This function is not implemented yet.')
+  },
+  refetchFriendship: async () => {
     throw new Error('This function is not implemented yet.')
   },
 }
@@ -94,6 +100,8 @@ export const useLIFFContext = (): LIFFContextType => {
   const [isInClient, setIsInClient] = useState(false)
   const [os, setOS] = useState<OS>(undefined)
   const [capabilities, setCapabilities] = useState<LIFFCapabilities[]>([])
+
+  const [isFriendship, setIsFriendship] = useState(false)
 
   const [versionType, setVersionType] = useState<LIFFSdkVersionType>(
     LIFFSdkVersionType.EDGE,
@@ -171,6 +179,7 @@ export const useLIFFContext = (): LIFFContextType => {
       const canSendMessage = userContext?.scope.includes('chat_message.write')
       const canShareTargetPicker = isApiAvailable('shareTargetPicker')
       const canScanCodeV2 = isApiAvailable('scanCodeV2')
+      const canRequestFriendship = isApiAvailable('requestFriendship')
 
       const userCapabilities: LIFFCapabilities[] = []
       if (canScanCodeV2) {
@@ -195,8 +204,15 @@ export const useLIFFContext = (): LIFFContextType => {
         const scopes = (await window.liff.permission.getGrantedAll?.()) || null
         console.log('Granted scopes:', scopes)
 
+        const friendship = await window.liff.getFriendship()
+        setIsFriendship(friendship.friendFlag)
+
         if (canShareTargetPicker) {
           userCapabilities.push(LIFFCapabilities.SHARE_TARGET_PICKER)
+        }
+
+        if (canRequestFriendship) {
+          userCapabilities.push(LIFFCapabilities.REQUEST_FRIENDSHIP)
         }
 
         if (scopes) {
@@ -273,6 +289,7 @@ export const useLIFFContext = (): LIFFContextType => {
     },
     [isReady, isUserScopeQuery, userScope, context],
   )
+
   const setSdkVersion = async (version: string, patch: boolean) => {
     const isCdnEdgeVersion = /^\d+$/.test(version)
     const isCdnFixedVersion = /^\d+\.\d+\.\d+$/.test(version)
@@ -301,6 +318,18 @@ export const useLIFFContext = (): LIFFContextType => {
     document.location.reload()
   }
 
+  const refetchFriendship = async () => {
+    if (!isReady) {
+      console.warn(
+        'LIFF is not ready. Please wait for LIFF to initialize before calling refetchFriendship.',
+      )
+      return
+    }
+
+    const friendship = await window.liff.getFriendship()
+    setIsFriendship(friendship.friendFlag)
+  }
+
   return {
     isReady,
     isLoggedIn,
@@ -318,11 +347,13 @@ export const useLIFFContext = (): LIFFContextType => {
     capabilities,
     userScope,
     isUserScopeQuery,
+    isFriendship,
     hasPermission,
     sdkVersion: {
       version: query.version,
       patch: query.patch,
       type: versionType,
     },
+    refetchFriendship,
   }
 }
