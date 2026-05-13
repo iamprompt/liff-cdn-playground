@@ -27,7 +27,8 @@ export const LIFF_SDK_VERSIONS = [
     type: LIFFSdkVersionType.SPECIFIC,
     label: 'Specific Version',
     versions: [
-      { version: '2.28.0', latest: true },
+      { version: '2.29.0', latest: true },
+      { version: '2.28.0', latest: false },
       { version: '2.27.3', latest: false },
       { version: '2.27.2', latest: false },
       { version: '2.27.1', latest: false },
