@@ -166,6 +166,10 @@ export const useLIFFContext = (): LIFFContextType => {
 
   const initializeLIFF = async () => {
     try {
+      if (typeof window.androidManifestFixPlugin !== 'undefined') {
+        window.liff.use(window.androidManifestFixPlugin)
+      }
+
       await window.liff.init({ liffId: customLiffId })
       setIsReady(true)
 
@@ -233,7 +237,7 @@ export const useLIFFContext = (): LIFFContextType => {
           }
         }
       }
-      
+
       setCapabilities(userCapabilities)
     } catch (error) {
       console.error('LIFF initialization failed:', error)
